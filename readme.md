@@ -65,3 +65,7 @@
 ### Требования
 
 * Установленная Java 23 или выше.
+
+### Sonar
+
+* https://sonarcloud.io/project/overview?id=R-Kiselev_EmployeeManagementSystem
