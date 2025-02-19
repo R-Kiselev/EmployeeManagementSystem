@@ -15,7 +15,13 @@ public class Employee {
 
     public Employee() {}
 
-    public Employee(final Long id, final String firstName, final String lastName, final String email, final LocalDate hireDate, final BigDecimal salary, final Boolean isActive) {
+    public Employee(final Long id,
+                    final String firstName,
+                    final String lastName,
+                    final String email,
+                    final LocalDate hireDate,
+                    final BigDecimal salary,
+                    final Boolean isActive) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;

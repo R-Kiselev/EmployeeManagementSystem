@@ -1,8 +1,7 @@
 package com.example.employeemanagementsystem.dao.impl;
 
-import com.example.employeemanagementsystem.model.Employee;
 import com.example.employeemanagementsystem.dao.EmployeeDao;
-
+import com.example.employeemanagementsystem.model.Employee;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,14 +14,12 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class EmployeeDaoImpl implements EmployeeDao
-{
+public class EmployeeDaoImpl implements EmployeeDao {
 
     private final Map<Long, Employee> employees = new HashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(1);
 
-    public EmployeeDaoImpl()
-    {
+    public EmployeeDaoImpl() {
         Employee emp1 =
             new Employee(idGenerator.getAndIncrement(), "John", "Doe", "john.doe@example.com",
                 LocalDate.of(2023, 1, 15),
@@ -42,22 +39,18 @@ public class EmployeeDaoImpl implements EmployeeDao
     }
 
     @Override
-    public Optional<Employee> findById(Long id)
-    {
+    public Optional<Employee> findById(Long id) {
         return Optional.ofNullable(employees.get(id));
     }
 
     @Override
-    public List<Employee> findAll()
-    {
+    public List<Employee> findAll() {
         return new ArrayList<>(employees.values());
     }
 
     @Override
-    public Employee save(Employee employee)
-    {
-        if (employee.getId() == null)
-        {
+    public Employee save(Employee employee) {
+        if (employee.getId() == null) {
             employee.setId(idGenerator.getAndIncrement());
         }
         employees.put(employee.getId(), employee);

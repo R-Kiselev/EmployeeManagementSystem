@@ -2,6 +2,7 @@ package com.example.employeemanagementsystem.model;
 
 public class Department {
 
+
     private Long id;
     private String name;
     private String description;

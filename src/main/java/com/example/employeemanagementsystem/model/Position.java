@@ -12,7 +12,11 @@ public class Position {
 
     public Position() {}
 
-    public Position(final Long id, final String name, final String description, final BigDecimal minSalary, final BigDecimal maxSalary) {
+    public Position(final Long id,
+                    final String name,
+                    final String description,
+                    final BigDecimal minSalary,
+                    final BigDecimal maxSalary) {
         this.id = id;
         this.name = name;
         this.description = description;
