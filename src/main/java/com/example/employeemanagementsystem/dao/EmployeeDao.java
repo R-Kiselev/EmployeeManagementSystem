@@ -1,14 +1,16 @@
 package com.example.employeemanagementsystem.dao;
 
 import com.example.employeemanagementsystem.model.Employee;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
+public interface EmployeeDao extends JpaRepository<Employee, Long> {
+    List<Employee> findBySalaryBetween(BigDecimal minSalary, BigDecimal maxSalary);
 
-public interface EmployeeDao {
-    Optional<Employee> findById(Long id);
+    List<Employee> findBySalaryGreaterThanEqual(BigDecimal minSalary);
 
-    List<Employee> findAll();
-
-    Employee save(Employee employee);
+    List<Employee> findBySalaryLessThanEqual(BigDecimal maxSalary);
 }
