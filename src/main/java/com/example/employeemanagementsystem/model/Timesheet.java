@@ -1,42 +1,30 @@
 package com.example.employeemanagementsystem.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Entity
+@Table(name = "timesheets")
 public class Timesheet {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDate date;
     private Integer workedHours;
-
-    public Timesheet() {}
-
-    public Timesheet(final Long id, final LocalDate date, final Integer workedHours) {
-        this.id = id;
-        this.date = date;
-        this.workedHours = workedHours;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(final LocalDate date) {
-        this.date = date;
-    }
-
-    public Integer getWorkedHours() {
-        return workedHours;
-    }
-
-    public void setWorkedHours(final Integer workedHours) {
-        this.workedHours = workedHours;
-    }
 }
