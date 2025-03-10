@@ -1,8 +1,10 @@
+// DepartmentController.java
 package com.example.employeemanagementsystem.controller;
 
-import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
-import com.example.employeemanagementsystem.model.Department;
+import com.example.employeemanagementsystem.dto.create.DepartmentCreateDto; // Импорт DepartmentCreateDto
+import com.example.employeemanagementsystem.dto.get.DepartmentDto;
 import com.example.employeemanagementsystem.service.DepartmentService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @RequestMapping("/api/departments")
 public class DepartmentController {
@@ -29,28 +30,31 @@ public class DepartmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Department> getDepartmentById(@PathVariable Long id) {
-        Department department = departmentService.getDepartmentById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
-        return ResponseEntity.ok(department);
+    public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable Long id) {
+        DepartmentDto departmentDto = departmentService.getDepartmentById(id);
+        return ResponseEntity.ok(departmentDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<Department>> getAllDepartments() {
-        List<Department> departments = departmentService.getAllDepartments();
+    public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
+        List<DepartmentDto> departments = departmentService.getAllDepartments();
         return ResponseEntity.ok(departments);
     }
 
     @PostMapping
-    public ResponseEntity<Department> createDepartment(@RequestBody Department department) {
-        Department createdDepartment = departmentService.createOrUpdateDepartment(department);
+    public ResponseEntity<DepartmentDto> createDepartment(
+        @Valid @RequestBody DepartmentCreateDto departmentDto) { // Изменили на DepartmentCreateDto и добавили @Valid
+        DepartmentDto createdDepartment = departmentService.createDepartment(departmentDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDepartment);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Department> updateDepartment(@PathVariable Long id,
-                                                       @RequestBody Department departmentDetails) {
-        Department updatedDepartment = departmentService.updateDepartment(id, departmentDetails);
+    public ResponseEntity<DepartmentDto> updateDepartment(
+        @PathVariable Long id,
+        @Valid @RequestBody
+        DepartmentCreateDto
+            departmentDetails) { // Изменили на DepartmentCreateDto (или DepartmentUpdateDto) и добавили @Valid
+        DepartmentDto updatedDepartment = departmentService.updateDepartment(id, departmentDetails);
         return ResponseEntity.ok(updatedDepartment);
     }
 
