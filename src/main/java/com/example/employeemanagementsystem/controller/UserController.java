@@ -1,14 +1,15 @@
+// UserController.java
 package com.example.employeemanagementsystem.controller;
 
-import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
-import com.example.employeemanagementsystem.model.User;
+import com.example.employeemanagementsystem.dto.create.UserCreateDto;
+import com.example.employeemanagementsystem.dto.get.UserDto;
 import com.example.employeemanagementsystem.service.UserService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,35 +23,32 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+        UserDto userDto = userService.getUserById(id);
+        return ResponseEntity.ok(userDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/username/{username}") // Добавляем endpoint для поиска по username
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
-        User user = userService.getUserByUsername(username)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found with username " + username));
-        return ResponseEntity.ok(user);
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
+        UserDto userDto = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userDto);
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.createUser(user);
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserCreateDto userCreateDto) {
+        UserDto createdUser = userService.createUser(userCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id,
-                                           @RequestBody User userDetails) {
-        User updatedUser = userService.updateUser(id, userDetails);
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserCreateDto userCreateDto) {
+        UserDto updatedUser = userService.updateUser(id, userCreateDto);
         return ResponseEntity.ok(updatedUser);
     }
 

@@ -1,9 +1,10 @@
 // RoleController.java
 package com.example.employeemanagementsystem.controller;
 
-import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
-import com.example.employeemanagementsystem.model.Role;
+import com.example.employeemanagementsystem.dto.create.RoleCreateDto;
+import com.example.employeemanagementsystem.dto.get.RoleDto;
 import com.example.employeemanagementsystem.service.RoleService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,27 +23,26 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Role> getRoleById(@PathVariable Long id) {
-        Role role = roleService.getRoleById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + id));
-        return ResponseEntity.ok(role);
+    public ResponseEntity<RoleDto> getRoleById(@PathVariable Long id) {
+        RoleDto roleDto = roleService.getRoleById(id);
+        return ResponseEntity.ok(roleDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<Role>> getAllRoles() {
-        List<Role> roles = roleService.getAllRoles();
+    public ResponseEntity<List<RoleDto>> getAllRoles() {
+        List<RoleDto> roles = roleService.getAllRoles();
         return ResponseEntity.ok(roles);
     }
 
     @PostMapping
-    public ResponseEntity<Role> createRole(@RequestBody Role role) {
-        Role createdRole = roleService.createRole(role);
+    public ResponseEntity<RoleDto> createRole(@Valid @RequestBody RoleCreateDto roleCreateDto) {
+        RoleDto createdRole = roleService.createRole(roleCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRole);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Role> updateRole(@PathVariable Long id, @RequestBody Role roleDetails) {
-        Role updatedRole = roleService.updateRole(id, roleDetails);
+    public ResponseEntity<RoleDto> updateRole(@PathVariable Long id, @Valid @RequestBody RoleCreateDto roleCreateDto) {
+        RoleDto updatedRole = roleService.updateRole(id, roleCreateDto);
         return ResponseEntity.ok(updatedRole);
     }
 

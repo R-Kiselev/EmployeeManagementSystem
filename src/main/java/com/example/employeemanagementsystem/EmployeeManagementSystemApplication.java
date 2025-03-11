@@ -23,38 +23,4 @@ public class EmployeeManagementSystemApplication {
         return new ModelMapper();
     }
 
-    @Bean
-    CommandLineRunner run(UserService userService, RoleService roleService) {
-        return args -> {
-            // Создаем роли, если их нет
-            Role adminRole = roleService.getRoleByName("ADMIN").orElseGet(() -> {
-                Role newAdminRole = new Role();
-                newAdminRole.setName("ADMIN");
-                return roleService.createRole(newAdminRole);
-            });
-
-            Role userRole = roleService.getRoleByName("USER").orElseGet(() -> {
-                Role newUserRole = new Role();
-                newUserRole.setName("USER");
-                return roleService.createRole(newUserRole);
-            });
-
-            // Создаем админа, если его нет
-            if (userService.getAllUsers().isEmpty()) {
-                User admin = new User();
-                admin.setUsername("admin");
-                admin.setPassword("adminpassword"); // Очень небезопасный пароль! Только для теста!
-                admin.setRoles(Set.of(adminRole));
-                userService.createUser(admin);
-            }
-            // Создаем обычного пользователя, если его нет
-            if (userService.getAllUsers().size() < 2) {
-                User user = new User();
-                user.setUsername("user");
-                user.setPassword("userpassword"); // Очень небезопасный пароль! Только для теста!
-                user.setRoles(Set.of(userRole));
-                userService.createUser(user);
-            }
-        };
-    }
 }

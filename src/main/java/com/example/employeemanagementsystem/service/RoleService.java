@@ -1,10 +1,14 @@
+// RoleService.java
 package com.example.employeemanagementsystem.service;
 
 import com.example.employeemanagementsystem.dao.RoleDao;
+import com.example.employeemanagementsystem.dto.create.RoleCreateDto;
+import com.example.employeemanagementsystem.dto.get.RoleDto;
 import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
+import com.example.employeemanagementsystem.mapper.RoleMapper;
 import com.example.employeemanagementsystem.model.Role;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,48 +17,55 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoleService {
 
     private final RoleDao roleDao;
+    private final RoleMapper roleMapper;
 
     @Autowired
-    public RoleService(RoleDao roleDao) {
+    public RoleService(RoleDao roleDao, RoleMapper roleMapper) {
         this.roleDao = roleDao;
+        this.roleMapper = roleMapper;
     }
 
     @Transactional(readOnly = true)
-    public Optional<Role> getRoleById(Long id) {
-        return roleDao.findById(id);
-    }
-    @Transactional(readOnly = true)
-    public Optional<Role> getRoleByName(String name) {
-        return roleDao.findByName(name);
+    public RoleDto getRoleById(Long id) {
+        return roleDao.findById(id)
+            .map(roleMapper::toDto)
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + id));
     }
 
     @Transactional(readOnly = true)
-    public List<Role> getAllRoles() {
-        return roleDao.findAll();
+    public List<RoleDto> getAllRoles() {
+        return roleDao.findAll().stream()
+            .map(roleMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     @Transactional
-    public Role createRole(Role role) {
-        return roleDao.save(role);
+    public RoleDto createRole(RoleCreateDto roleCreateDto) {
+        Role role = roleMapper.toEntity(roleCreateDto);
+        Role savedRole = roleDao.save(role);
+        return roleMapper.toDto(savedRole);
     }
 
     @Transactional
-    public Role updateRole(Long id, Role roleDetails) {
+    public RoleDto updateRole(Long id, RoleCreateDto roleCreateDto) {
         Role role = roleDao.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + id));
 
-        role.setName(roleDetails.getName());
-        //Связь
-        if (roleDetails.getUsers() != null && !roleDetails.getUsers().isEmpty()){
-            role.setUsers(roleDetails.getUsers());
-        }
-        return roleDao.save(role);
+        roleMapper.updateRoleFromDto(roleCreateDto, role);
+        Role updatedRole = roleDao.save(role);
+        return roleMapper.toDto(updatedRole);
     }
 
     @Transactional
     public void deleteRole(Long id) {
-        roleDao.findById(id).orElseThrow(() ->
-            new ResourceNotFoundException("Role not found with id " + id));
+        roleDao.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + id));
         roleDao.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Role findRoleByName(String roleName) {
+        return roleDao.findByName(roleName)
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found with name " + roleName));
     }
 }
