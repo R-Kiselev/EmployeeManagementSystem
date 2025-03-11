@@ -18,7 +18,7 @@ public class EmployeeManagementSystemApplication {
         SpringApplication.run(EmployeeManagementSystemApplication.class, args);
     }
 
-    @Bean  //  <-- Вот здесь
+    @Bean  
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }

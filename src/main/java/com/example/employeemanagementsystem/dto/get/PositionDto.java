@@ -1,4 +1,4 @@
-// ./dto/get/PositionDto.java
+
 package com.example.employeemanagementsystem.dto.get;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

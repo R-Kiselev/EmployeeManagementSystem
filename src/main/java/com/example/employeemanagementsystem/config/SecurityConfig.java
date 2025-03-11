@@ -1,4 +1,4 @@
-// SecurityConfig.java
+
 package com.example.employeemanagementsystem.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -24,11 +24,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable) // Оставь (для разработки)
+            .csrf(AbstractHttpConfigurer::disable) 
             .authorizeHttpRequests(authz -> authz
-                .anyRequest().permitAll() // Разрешаем ВСЕ запросы
+                .anyRequest().permitAll() 
             );
-        //.httpBasic(withDefaults()); //Удали, чтобы не было basic авторизации
+        
 
         return http.build();
     }

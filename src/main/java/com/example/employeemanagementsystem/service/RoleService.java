@@ -1,4 +1,4 @@
-// RoleService.java
+
 package com.example.employeemanagementsystem.service;
 
 import com.example.employeemanagementsystem.dao.RoleDao;
@@ -66,6 +66,7 @@ public class RoleService {
     @Transactional(readOnly = true)
     public Role findRoleByName(String roleName) {
         return roleDao.findByName(roleName)
-            .orElseThrow(() -> new ResourceNotFoundException("Role not found with name " + roleName));
+            .orElseThrow(() ->
+                new ResourceNotFoundException("Role not found with name " + roleName));
     }
 }

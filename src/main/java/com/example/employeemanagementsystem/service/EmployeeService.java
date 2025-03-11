@@ -1,4 +1,4 @@
-// EmployeeService.java
+
 package com.example.employeemanagementsystem.service;
 
 import com.example.employeemanagementsystem.dao.EmployeeDao;
@@ -28,12 +28,12 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Employee> getEmployeeById(Long id) { // Возвращает Optional<Employee>
+    public Optional<Employee> getEmployeeById(Long id) { 
         return employeeDao.findById(id);
     }
 
     @Transactional(readOnly = true)
-    public EmployeeDto getEmployeeDtoById(Long id) { // Добавили метод, который возвращает EmployeeDto
+    public EmployeeDto getEmployeeDtoById(Long id) { 
         return employeeDao.findById(id)
             .map(employeeMapper::toDto)
             .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id " + id));
@@ -79,7 +79,7 @@ public class EmployeeService {
     public EmployeeDto createEmployee(EmployeeCreateDto employeeDto) {
         Employee employee = employeeMapper.toEntity(employeeDto);
         Employee savedEmployee = employeeDao.save(employee);
-        return employeeMapper.toDto(savedEmployee); // Возвращаем EmployeeDto
+        return employeeMapper.toDto(savedEmployee); 
     }
 
     @Transactional
@@ -87,11 +87,12 @@ public class EmployeeService {
         Employee employee =
             employeeDao
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id " + id));
+                .orElseThrow(() ->
+                    new ResourceNotFoundException("Employee not found with id " + id));
 
         employeeMapper.updateEmployeeFromDto(employeeDto, employee);
         Employee updatedEmployee = employeeDao.save(employee);
-        return employeeMapper.toDto(updatedEmployee); // Возвращаем EmployeeDto
+        return employeeMapper.toDto(updatedEmployee); 
     }
 
     @Transactional

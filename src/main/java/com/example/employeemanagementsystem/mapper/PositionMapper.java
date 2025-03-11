@@ -1,4 +1,4 @@
-//PositionMapper.java
+
 package com.example.employeemanagementsystem.mapper;
 
 import com.example.employeemanagementsystem.dto.create.PositionCreateDto;
@@ -9,7 +9,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PositionMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "employees", ignore = true)

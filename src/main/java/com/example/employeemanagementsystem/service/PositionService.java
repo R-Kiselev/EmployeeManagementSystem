@@ -1,4 +1,4 @@
-// PositionService.java
+
 package com.example.employeemanagementsystem.service;
 
 import com.example.employeemanagementsystem.dao.PositionDao;
@@ -58,7 +58,7 @@ public class PositionService {
 
     @Transactional
     public void deletePosition(Long id) {
-        if (!positionDao.existsById(id)) { // Проверяем существование перед удалением
+        if (!positionDao.existsById(id)) { 
             throw new ResourceNotFoundException("Position not found with id " + id);
         }
         positionDao.deleteById(id);

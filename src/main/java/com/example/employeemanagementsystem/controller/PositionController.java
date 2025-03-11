@@ -1,4 +1,4 @@
-// PositionController.java
+
 package com.example.employeemanagementsystem.controller;
 
 import com.example.employeemanagementsystem.dto.create.PositionCreateDto;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PositionController {
 
     private final PositionService positionService;
-    private final EmployeeService employeeService; // Добавлено для получения сотрудников по должности
+    private final EmployeeService employeeService; 
 
     @Autowired
     public PositionController(PositionService positionService, EmployeeService employeeService) {
@@ -46,13 +46,15 @@ public class PositionController {
     }
 
     @PostMapping
-    public ResponseEntity<PositionDto> createPosition(@Valid @RequestBody PositionCreateDto positionCreateDto) {
+    public ResponseEntity<PositionDto> createPosition(
+        @Valid @RequestBody PositionCreateDto positionCreateDto) {
         PositionDto createdPosition = positionService.createPosition(positionCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPosition);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PositionDto> updatePosition(@PathVariable Long id, @Valid @RequestBody PositionCreateDto positionCreateDto) {
+    public ResponseEntity<PositionDto> updatePosition(
+        @PathVariable Long id, @Valid @RequestBody PositionCreateDto positionCreateDto) {
         PositionDto updatedPosition = positionService.updatePosition(id, positionCreateDto);
         return ResponseEntity.ok(updatedPosition);
     }

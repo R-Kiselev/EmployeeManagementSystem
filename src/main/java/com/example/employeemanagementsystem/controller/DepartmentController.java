@@ -1,11 +1,11 @@
-// DepartmentController.java
+
 package com.example.employeemanagementsystem.controller;
 
 import com.example.employeemanagementsystem.dto.create.DepartmentCreateDto;
 import com.example.employeemanagementsystem.dto.get.DepartmentDto;
-import com.example.employeemanagementsystem.dto.get.EmployeeDto; // Импортируем EmployeeDto
+import com.example.employeemanagementsystem.dto.get.EmployeeDto; 
 import com.example.employeemanagementsystem.service.DepartmentService;
-import com.example.employeemanagementsystem.service.EmployeeService; // Импортируем EmployeeService
+import com.example.employeemanagementsystem.service.EmployeeService; 
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +25,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class DepartmentController {
 
     private final DepartmentService departmentService;
-    private final EmployeeService employeeService; // Добавляем EmployeeService
+    private final EmployeeService employeeService; 
 
     @Autowired
-    public DepartmentController(DepartmentService departmentService, EmployeeService employeeService) {
+    public DepartmentController(DepartmentService departmentService,
+                                EmployeeService employeeService) {
         this.departmentService = departmentService;
-        this.employeeService = employeeService; // Внедряем EmployeeService
+        this.employeeService = employeeService; 
     }
 
     @GetMapping("/{id}")
@@ -56,7 +57,8 @@ public class DepartmentController {
     public ResponseEntity<DepartmentDto> updateDepartment(
         @PathVariable Long id,
         @Valid @RequestBody DepartmentCreateDto departmentDetails) {
-        DepartmentDto updatedDepartment = departmentService.updateDepartment(id, departmentDetails);
+        DepartmentDto updatedDepartment = departmentService.updateDepartment(id,
+            departmentDetails);
         return ResponseEntity.ok(updatedDepartment);
     }
 
@@ -66,9 +68,10 @@ public class DepartmentController {
         return ResponseEntity.noContent().build();
     }
 
-    // Добавляем эндпоинт для получения сотрудников по ID департамента
+    
     @GetMapping("/{departmentId}/employees")
-    public ResponseEntity<List<EmployeeDto>> getEmployeesByDepartment(@PathVariable Long departmentId) {
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByDepartment(
+        @PathVariable Long departmentId) {
         List<EmployeeDto> employees = employeeService.getEmployeesByDepartmentId(departmentId);
         return ResponseEntity.ok(employees);
     }

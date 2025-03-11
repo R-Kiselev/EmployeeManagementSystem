@@ -1,4 +1,4 @@
-// ./dto/get/EmployeeDto.java
+
 package com.example.employeemanagementsystem.dto.get;
 
 import com.example.employeemanagementsystem.dto.get.DepartmentDto;
@@ -32,6 +32,6 @@ public class EmployeeDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private PositionDto position;
 
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    private UserDto user;
+
+
 }

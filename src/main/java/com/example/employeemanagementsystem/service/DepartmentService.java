@@ -1,4 +1,4 @@
-// DepartmentService.java
+
 package com.example.employeemanagementsystem.service;
 
 import com.example.employeemanagementsystem.dao.DepartmentDao;
@@ -35,12 +35,13 @@ public class DepartmentService {
 
     @Transactional(readOnly = true)
     public List<DepartmentDto> getAllDepartments() {
-        return departmentDao.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
+        return departmentDao.findAll()
+                .stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     @Transactional
     public DepartmentDto createDepartment(
-        DepartmentCreateDto departmentCreateDto) { // Используем DepartmentCreateDto
+        DepartmentCreateDto departmentCreateDto) { 
         Department department = modelMapper.map(departmentCreateDto, Department.class);
         Department savedDepartment = departmentDao.save(department);
         return convertToDto(savedDepartment);
@@ -48,11 +49,12 @@ public class DepartmentService {
 
     @Transactional
     public DepartmentDto updateDepartment(
-        Long id, DepartmentCreateDto departmentCreateDto) { // Используем DepartmentCreateDto
+        Long id, DepartmentCreateDto departmentCreateDto) { 
         Department department =
             departmentDao
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
+                .orElseThrow(() ->
+                    new ResourceNotFoundException("Department not found with id " + id));
 
         modelMapper.map(departmentCreateDto, department);
         Department updatedDepartment = departmentDao.save(department);

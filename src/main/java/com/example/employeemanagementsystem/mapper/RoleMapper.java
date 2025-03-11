@@ -1,4 +1,4 @@
-// RoleMapper.java
+
 package com.example.employeemanagementsystem.mapper;
 
 import com.example.employeemanagementsystem.dto.create.RoleCreateDto;
@@ -9,11 +9,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface RoleMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "users", ignore = true) // users устанавливаются через UserService
+    @Mapping(target = "users", ignore = true) 
     Role toEntity(RoleCreateDto dto);
 
     RoleDto toDto(Role entity);

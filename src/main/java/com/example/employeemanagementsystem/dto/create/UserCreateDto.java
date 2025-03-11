@@ -1,4 +1,4 @@
-// ./dto/create/UserCreateDto.java
+
 package com.example.employeemanagementsystem.dto.create;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,9 +24,9 @@ public class UserCreateDto {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
-    @NotNull(message = "Employee ID cannot be null") //При создании user, employee должен быть
+    @NotNull(message = "Employee ID cannot be null") 
     private Long employeeId;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) // Валидация, что роли указаны, если они есть
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) 
     private Set<Long> roleIds;
 }
