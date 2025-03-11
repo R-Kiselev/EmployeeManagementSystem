@@ -59,6 +59,22 @@ public class EmployeeService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<EmployeeDto> getEmployeesByDepartmentId(Long departmentId) {
+        List<Employee> employees = employeeDao.findByDepartmentId(departmentId);
+        return employees.stream()
+            .map(employeeMapper::toDto)
+            .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<EmployeeDto> getEmployeesByPositionId(Long positionId) {
+        List<Employee> employees = employeeDao.findByPositionId(positionId);
+        return employees.stream()
+            .map(employeeMapper::toDto)
+            .collect(Collectors.toList());
+    }
+
     @Transactional
     public EmployeeDto createEmployee(EmployeeCreateDto employeeDto) {
         Employee employee = employeeMapper.toEntity(employeeDto);

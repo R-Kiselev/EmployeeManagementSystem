@@ -1,9 +1,11 @@
 // DepartmentController.java
 package com.example.employeemanagementsystem.controller;
 
-import com.example.employeemanagementsystem.dto.create.DepartmentCreateDto; // Импорт DepartmentCreateDto
+import com.example.employeemanagementsystem.dto.create.DepartmentCreateDto;
 import com.example.employeemanagementsystem.dto.get.DepartmentDto;
+import com.example.employeemanagementsystem.dto.get.EmployeeDto; // Импортируем EmployeeDto
 import com.example.employeemanagementsystem.service.DepartmentService;
+import com.example.employeemanagementsystem.service.EmployeeService; // Импортируем EmployeeService
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class DepartmentController {
 
     private final DepartmentService departmentService;
+    private final EmployeeService employeeService; // Добавляем EmployeeService
 
     @Autowired
-    public DepartmentController(DepartmentService departmentService) {
+    public DepartmentController(DepartmentService departmentService, EmployeeService employeeService) {
         this.departmentService = departmentService;
+        this.employeeService = employeeService; // Внедряем EmployeeService
     }
 
     @GetMapping("/{id}")
@@ -43,7 +47,7 @@ public class DepartmentController {
 
     @PostMapping
     public ResponseEntity<DepartmentDto> createDepartment(
-        @Valid @RequestBody DepartmentCreateDto departmentDto) { // Изменили на DepartmentCreateDto и добавили @Valid
+        @Valid @RequestBody DepartmentCreateDto departmentDto) {
         DepartmentDto createdDepartment = departmentService.createDepartment(departmentDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDepartment);
     }
@@ -51,9 +55,7 @@ public class DepartmentController {
     @PutMapping("/{id}")
     public ResponseEntity<DepartmentDto> updateDepartment(
         @PathVariable Long id,
-        @Valid @RequestBody
-        DepartmentCreateDto
-            departmentDetails) { // Изменили на DepartmentCreateDto (или DepartmentUpdateDto) и добавили @Valid
+        @Valid @RequestBody DepartmentCreateDto departmentDetails) {
         DepartmentDto updatedDepartment = departmentService.updateDepartment(id, departmentDetails);
         return ResponseEntity.ok(updatedDepartment);
     }
@@ -62,5 +64,12 @@ public class DepartmentController {
     public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
         departmentService.deleteDepartment(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Добавляем эндпоинт для получения сотрудников по ID департамента
+    @GetMapping("/{departmentId}/employees")
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByDepartment(@PathVariable Long departmentId) {
+        List<EmployeeDto> employees = employeeService.getEmployeesByDepartmentId(departmentId);
+        return ResponseEntity.ok(employees);
     }
 }

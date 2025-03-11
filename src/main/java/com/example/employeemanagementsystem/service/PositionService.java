@@ -2,10 +2,13 @@
 package com.example.employeemanagementsystem.service;
 
 import com.example.employeemanagementsystem.dao.PositionDao;
+import com.example.employeemanagementsystem.dto.create.PositionCreateDto;
+import com.example.employeemanagementsystem.dto.get.PositionDto;
 import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
+import com.example.employeemanagementsystem.mapper.PositionMapper;
 import com.example.employeemanagementsystem.model.Position;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,53 +17,50 @@ import org.springframework.transaction.annotation.Transactional;
 public class PositionService {
 
     private final PositionDao positionDao;
+    private final PositionMapper positionMapper;
 
     @Autowired
-    public PositionService(PositionDao positionDao) {
+    public PositionService(PositionDao positionDao, PositionMapper positionMapper) {
         this.positionDao = positionDao;
+        this.positionMapper = positionMapper;
     }
 
     @Transactional(readOnly = true)
-    public Optional<Position> getPositionById(Long id) {
-        return positionDao.findById(id);
-    }
-    @Transactional(readOnly = true)
-    public Optional<Position> getPositionByName(String name) { // Добавляем для CommandLineRunner
-        return positionDao.findByName(name);
+    public PositionDto getPositionById(Long id) {
+        return positionDao.findById(id)
+            .map(positionMapper::toDto)
+            .orElseThrow(() -> new ResourceNotFoundException("Position not found with id " + id));
     }
 
     @Transactional(readOnly = true)
-    public List<Position> getAllPositions() {
-        return positionDao.findAll();
+    public List<PositionDto> getAllPositions() {
+        return positionDao.findAll().stream()
+            .map(positionMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     @Transactional
-    public Position createPosition(Position position) {
-        return positionDao.save(position);
+    public PositionDto createPosition(PositionCreateDto positionCreateDto) {
+        Position position = positionMapper.toEntity(positionCreateDto);
+        Position savedPosition = positionDao.save(position);
+        return positionMapper.toDto(savedPosition);
     }
 
     @Transactional
-    public Position updatePosition(Long id, Position positionDetails) {
+    public PositionDto updatePosition(Long id, PositionCreateDto positionCreateDto) {
         Position position = positionDao.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Position not found with id " + id));
 
-        position.setName(positionDetails.getName());
-        position.setDescription(positionDetails.getDescription());
-        position.setMinSalary(positionDetails.getMinSalary());
-        position.setMaxSalary(positionDetails.getMaxSalary());
-
-        //Связи обновляем, если приходят не null значения
-        if(positionDetails.getEmployees() != null && !positionDetails.getEmployees().isEmpty())
-        {
-            position.setEmployees(positionDetails.getEmployees());
-        }
-        return positionDao.save(position);
+        positionMapper.updatePositionFromDto(positionCreateDto, position);
+        Position updatedPosition = positionDao.save(position);
+        return positionMapper.toDto(updatedPosition);
     }
 
     @Transactional
     public void deletePosition(Long id) {
-        positionDao.findById(id).orElseThrow(() ->
-            new ResourceNotFoundException("Position not found with id " + id));
+        if (!positionDao.existsById(id)) { // Проверяем существование перед удалением
+            throw new ResourceNotFoundException("Position not found with id " + id);
+        }
         positionDao.deleteById(id);
     }
 }
