@@ -87,7 +87,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    public Employee updateEmployeeWithoutDto(Employee employee){
+    public Employee updateEmployeeWithoutDto(Employee employee) {
         return employeeDao.save(employee);
     }
 }

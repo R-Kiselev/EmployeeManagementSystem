@@ -1,51 +1,36 @@
+// UserMapper.java
 package com.example.employeemanagementsystem.mapper;
 
-import com.example.employeemanagementsystem.dto.create.UserCreateDto;
-import com.example.employeemanagementsystem.dto.get.UserDto;
-import com.example.employeemanagementsystem.model.Role;
+import com.example.employeemanagementsystem.dao.UserDao; // Предполагаем, что есть UserDao
+import com.example.employeemanagementsystem.dto.create.UserCreateDto; // Если есть DTO для User
+import com.example.employeemanagementsystem.dto.get.UserDto; // Если есть DTO для User
 import com.example.employeemanagementsystem.model.User;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(
-    componentModel = "spring",
-    uses = {EmployeeMapper.class, RoleMapper.class},
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface UserMapper {
 
-//    @Mapping(target = "id", ignore = true)
-//    @Mapping(source = "employeeId", target = "employee.id")
-//    @Mapping(
-//        source = "roleIds",
-//        target = "roles",
-//        qualifiedByName = "mapRoleIdsToRoles") // Используем qualifiedByName
-//    User toEntity(UserCreateDto dto);
-//
-//    //  User -> UserDto  (УБИРАЕМ явный маппинг employeeId)
-//    UserDto toDto(User user);
-//
-//    @Mapping(target = "id", ignore = true)
-//    @Mapping(source = "employeeId", target = "employee.id")
-//    @Mapping(
-//        source = "roleIds",
-//        target = "roles",
-//        qualifiedByName = "mapRoleIdsToRoles")
-//    void updateUserFromDto(UserCreateDto dto, @MappingTarget User entity);
-//
-//    // Вспомогательный метод для маппинга Set<Long> (roleIds) в Set<Role>
-//    @Named("mapRoleIdsToRoles")
-//    default Set<Role> mapRoleIdsToRoles(Set<Long> roleIds) {
-//        if (roleIds == null) {
-//            return null;
-//        }
-//        // ВАЖНО:  В реальном приложении здесь нужна зависимость от RoleService!
-//        //         Внедрять сервисы в мапперы - плохая практика.
-//        //         Лучше перенести эту логику в UserService.
-//        return roleIds.stream().map(id -> new Role(id, null, null)).collect(Collectors.toSet());
-//    }
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public abstract class UserMapper { // Или interface, если нет методов, как в PositionMapper
+
+    @Autowired
+    protected UserDao userDao; // Если нужен UserDao, делаем abstract class
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "employee", ignore = true) // Скорее всего, employee нужно игнорировать
+    public abstract User toEntity(UserCreateDto userCreateDto); //если есть userCreateDto
+
+    public abstract UserDto toDto(User user); //если есть userDto
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "employee", ignore = true)
+    public abstract void updateUserFromDto(UserCreateDto dto, @MappingTarget User entity); //если есть userCreateDto
+
+    // Если НУЖЕН UserDao (например, для получения User по username, а не по ID)
+    // То делаем, как с Department и Position
+    protected User userFromId(Long userId) { //метод для маппинга user
+        return userId == null ? null : userDao.findById(userId).orElse(null);
+    }
 }
