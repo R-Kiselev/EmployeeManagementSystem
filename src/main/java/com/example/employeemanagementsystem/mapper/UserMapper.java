@@ -63,7 +63,7 @@ public abstract class UserMapper { // Или interface, если нет мето
     @Mapping(target = "employee", ignore = true)
     public abstract void updateUserFromDto(UserCreateDto dto, @MappingTarget User entity); //если есть userCreateDto
 
-    protected User userFromId(Long userId) {
-        return userId == null ? null : userDao.findById(userId).orElse(null);
-    }
+//    protected User userFromId(Long userId) {
+//        return userId == null ? null : userDao.findById(userId).orElse(null);
+//    }
 }

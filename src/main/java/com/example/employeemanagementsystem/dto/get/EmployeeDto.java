@@ -32,6 +32,6 @@ public class EmployeeDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private PositionDto position;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private UserDto user;
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
+//    private UserDto user;
 }
