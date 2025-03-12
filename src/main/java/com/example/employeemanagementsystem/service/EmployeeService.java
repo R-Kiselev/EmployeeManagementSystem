@@ -1,4 +1,3 @@
-
 package com.example.employeemanagementsystem.service;
 
 import com.example.employeemanagementsystem.dao.EmployeeDao;
@@ -10,13 +9,14 @@ import com.example.employeemanagementsystem.model.Employee;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmployeeService {
+
+    private static final String EMPLOYEE_NOT_FOUND_MESSAGE = "Employee not found with id ";
 
     private final EmployeeDao employeeDao;
     private final EmployeeMapper employeeMapper;
@@ -28,22 +28,20 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Employee> getEmployeeById(Long id) { 
+    public Optional<Employee> getEmployeeById(Long id) {
         return employeeDao.findById(id);
     }
 
     @Transactional(readOnly = true)
-    public EmployeeDto getEmployeeDtoById(Long id) { 
+    public EmployeeDto getEmployeeDtoById(Long id) {
         return employeeDao.findById(id)
             .map(employeeMapper::toDto)
-            .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id " + id));
+            .orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE_NOT_FOUND_MESSAGE + id));
     }
 
     @Transactional(readOnly = true)
     public List<EmployeeDto> getAllEmployees() {
-        return employeeDao.findAll().stream()
-            .map(employeeMapper::toDto)
-            .collect(Collectors.toList());
+        return employeeDao.findAll().stream().map(employeeMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
@@ -62,24 +60,20 @@ public class EmployeeService {
     @Transactional(readOnly = true)
     public List<EmployeeDto> getEmployeesByDepartmentId(Long departmentId) {
         List<Employee> employees = employeeDao.findByDepartmentId(departmentId);
-        return employees.stream()
-            .map(employeeMapper::toDto)
-            .collect(Collectors.toList());
+        return employees.stream().map(employeeMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
     public List<EmployeeDto> getEmployeesByPositionId(Long positionId) {
         List<Employee> employees = employeeDao.findByPositionId(positionId);
-        return employees.stream()
-            .map(employeeMapper::toDto)
-            .collect(Collectors.toList());
+        return employees.stream().map(employeeMapper::toDto).toList();
     }
 
     @Transactional
     public EmployeeDto createEmployee(EmployeeCreateDto employeeDto) {
         Employee employee = employeeMapper.toEntity(employeeDto);
         Employee savedEmployee = employeeDao.save(employee);
-        return employeeMapper.toDto(savedEmployee); 
+        return employeeMapper.toDto(savedEmployee);
     }
 
     @Transactional
@@ -87,18 +81,16 @@ public class EmployeeService {
         Employee employee =
             employeeDao
                 .findById(id)
-                .orElseThrow(() ->
-                    new ResourceNotFoundException("Employee not found with id " + id));
-
+                .orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE_NOT_FOUND_MESSAGE + id));
         employeeMapper.updateEmployeeFromDto(employeeDto, employee);
         Employee updatedEmployee = employeeDao.save(employee);
-        return employeeMapper.toDto(updatedEmployee); 
+        return employeeMapper.toDto(updatedEmployee);
     }
 
     @Transactional
     public void deleteEmployee(Long id) {
         if (!employeeDao.existsById(id)) {
-            throw new ResourceNotFoundException("Employee not found with id " + id);
+            throw new ResourceNotFoundException(EMPLOYEE_NOT_FOUND_MESSAGE + id);
         }
         employeeDao.deleteById(id);
     }

@@ -1,4 +1,3 @@
-
 package com.example.employeemanagementsystem.service;
 
 import com.example.employeemanagementsystem.dao.PositionDao;
@@ -16,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PositionService {
 
+    private static final String POSITION_NOT_FOUND_MESSAGE = "Position not found with id ";
+
     private final PositionDao positionDao;
     private final PositionMapper positionMapper;
 
@@ -29,14 +30,14 @@ public class PositionService {
     public PositionDto getPositionById(Long id) {
         return positionDao.findById(id)
             .map(positionMapper::toDto)
-            .orElseThrow(() -> new ResourceNotFoundException("Position not found with id " + id));
+            .orElseThrow(() -> new ResourceNotFoundException(POSITION_NOT_FOUND_MESSAGE + id));
     }
 
     @Transactional(readOnly = true)
     public List<PositionDto> getAllPositions() {
         return positionDao.findAll().stream()
             .map(positionMapper::toDto)
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()); // Or .toList() for Java 16+ unmodifiable list
     }
 
     @Transactional
@@ -49,8 +50,7 @@ public class PositionService {
     @Transactional
     public PositionDto updatePosition(Long id, PositionCreateDto positionCreateDto) {
         Position position = positionDao.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Position not found with id " + id));
-
+            .orElseThrow(() -> new ResourceNotFoundException(POSITION_NOT_FOUND_MESSAGE + id));
         positionMapper.updatePositionFromDto(positionCreateDto, position);
         Position updatedPosition = positionDao.save(position);
         return positionMapper.toDto(updatedPosition);
@@ -58,8 +58,8 @@ public class PositionService {
 
     @Transactional
     public void deletePosition(Long id) {
-        if (!positionDao.existsById(id)) { 
-            throw new ResourceNotFoundException("Position not found with id " + id);
+        if (!positionDao.existsById(id)) {
+            throw new ResourceNotFoundException(POSITION_NOT_FOUND_MESSAGE + id);
         }
         positionDao.deleteById(id);
     }
