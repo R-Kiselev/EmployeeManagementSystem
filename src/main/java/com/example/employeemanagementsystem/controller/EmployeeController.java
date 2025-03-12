@@ -8,7 +8,6 @@ import com.example.employeemanagementsystem.service.EmployeeService;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-    private final EmployeeMapper employeeMapper; 
+    private final EmployeeMapper employeeMapper;
 
     @Autowired
     public EmployeeController(EmployeeService employeeService, EmployeeMapper employeeMapper) {
         this.employeeService = employeeService;
-        this.employeeMapper = employeeMapper; 
+        this.employeeMapper = employeeMapper;
     }
 
     @GetMapping("/{id}")
@@ -47,10 +46,10 @@ public class EmployeeController {
         @RequestParam(value = "max_salary", required = false) BigDecimal maxSalary) {
 
         List<Employee> employees = employeeService.getEmployeesBySalaryRange(minSalary, maxSalary);
-        List<EmployeeDto> employeeDtos =
-            employees.stream()
-                .map(employeeMapper::toDto) 
-                .collect(Collectors.toList());
+        List<EmployeeDto> employeeDtos = employees.stream()
+            .map(employeeMapper::toDto)
+            .toList(); // Use .toList() directly
+
         return ResponseEntity.ok(employeeDtos);
     }
 
