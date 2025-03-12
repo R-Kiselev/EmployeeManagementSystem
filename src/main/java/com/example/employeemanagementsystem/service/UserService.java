@@ -141,7 +141,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         userDao.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
+            .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID_MESSAGE + id));
         userDao.deleteById(id);
     }
 }
