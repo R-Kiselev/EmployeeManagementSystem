@@ -2,12 +2,14 @@ package com.example.employeemanagementsystem.mapper;
 
 import com.example.employeemanagementsystem.dao.DepartmentDao;
 import com.example.employeemanagementsystem.dao.PositionDao;
+import com.example.employeemanagementsystem.dao.UserDao; // Добавлен UserDao
 import com.example.employeemanagementsystem.dto.create.EmployeeCreateDto;
 import com.example.employeemanagementsystem.dto.get.EmployeeDto;
 import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
 import com.example.employeemanagementsystem.model.Department;
 import com.example.employeemanagementsystem.model.Employee;
 import com.example.employeemanagementsystem.model.Position;
+import com.example.employeemanagementsystem.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -27,9 +29,13 @@ public abstract class EmployeeMapper {
     @Autowired
     protected PositionDao positionDao;
 
+    @Autowired
+    protected UserDao userDao; // Добавлен UserDao
+
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "departmentId", target = "department")
     @Mapping(source = "positionId", target = "position")
+    @Mapping(source = "userId", target = "user") // Маппинг userId на user
     public abstract Employee toEntity(EmployeeCreateDto dto);
 
     public abstract EmployeeDto toDto(Employee entity);
@@ -37,6 +43,7 @@ public abstract class EmployeeMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "departmentId", target = "department")
     @Mapping(source = "positionId", target = "position")
+    @Mapping(source = "userId", target = "user") // Маппинг userId на user при обновлении
     public abstract void updateEmployeeFromDto(EmployeeCreateDto dto,
                                                @MappingTarget Employee entity);
 
@@ -53,5 +60,11 @@ public abstract class EmployeeMapper {
             : positionDao.findById(positionId)
             .orElseThrow(() -> new ResourceNotFoundException("Position not found with id "
                 + positionId));
+    }
+
+    protected User userFromId(Long userId) { // Метод для получения User по ID
+        return userId == null ? null
+            : userDao.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
     }
 }

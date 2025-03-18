@@ -1,5 +1,6 @@
 package com.example.employeemanagementsystem.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -34,7 +35,7 @@ public class User {
     @Column(unique = true)
     private String username;
 
-    private String password; 
+    private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -44,7 +45,7 @@ public class User {
     )
     private Set<Role> roles;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id")
-    private Employee employee;
+    @OneToOne(mappedBy = "user",
+        cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY) // Изменено на user
+    private Employee employee; // У User теперь ссылка на Employee
 }

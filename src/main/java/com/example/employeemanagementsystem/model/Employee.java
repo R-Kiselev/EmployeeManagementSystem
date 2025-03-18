@@ -1,6 +1,5 @@
 package com.example.employeemanagementsystem.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -50,9 +49,7 @@ public class Employee {
     @JoinColumn(name = "position_id")
     private Position position;
 
-    @OneToOne(mappedBy = "employee",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true,
-        fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY) // Изменено на LAZY
+    @JoinColumn(name = "user_id")   // Внешний ключ теперь user_id
     private User user;
 }

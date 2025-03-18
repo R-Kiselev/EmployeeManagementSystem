@@ -32,8 +32,12 @@ public class EmployeeCreateDto {
 
     private Boolean isActive;
 
+    @NotNull(message = "Department ID cannot be null")
     private Long departmentId;
 
+    @NotNull(message = "Position ID cannot be null")
     private Long positionId;
+
+    @NotNull(message = "User ID cannot be null")
     private Long userId;
 }

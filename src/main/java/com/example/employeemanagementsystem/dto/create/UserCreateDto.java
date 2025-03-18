@@ -1,11 +1,9 @@
-
 package com.example.employeemanagementsystem.dto.create;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Set;
 import lombok.Getter;
@@ -24,9 +22,6 @@ public class UserCreateDto {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
-    @NotNull(message = "Employee ID cannot be null") 
-    private Long employeeId;
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Set<Long> roleIds;
 }

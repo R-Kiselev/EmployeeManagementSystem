@@ -1,9 +1,5 @@
-
 package com.example.employeemanagementsystem.dto.get;
 
-import com.example.employeemanagementsystem.dto.get.DepartmentDto;
-import com.example.employeemanagementsystem.dto.get.PositionDto;
-import com.example.employeemanagementsystem.dto.get.UserDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -31,7 +27,6 @@ public class EmployeeDto {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private PositionDto position;
-
-
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private UserDto user;
 }
