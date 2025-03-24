@@ -46,6 +46,6 @@ public class User {
     private Set<Role> roles;
 
     @OneToOne(mappedBy = "user",
-        cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY) // Изменено на user
-    private Employee employee; // У User теперь ссылка на Employee
+        cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Employee employee;
 }

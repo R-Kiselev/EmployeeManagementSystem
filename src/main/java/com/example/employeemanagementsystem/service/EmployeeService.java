@@ -22,7 +22,7 @@ public class EmployeeService {
 
     private final EmployeeDao employeeDao;
     private final EmployeeMapper employeeMapper;
-    private final UserDao userDao; // Добавлен UserDao
+    private final UserDao userDao; 
 
     @Autowired
     public EmployeeService(EmployeeDao employeeDao,
@@ -33,12 +33,10 @@ public class EmployeeService {
         this.userDao = userDao;
     }
 
-    // ... (остальные методы без изменений)
-
     @Transactional
     public EmployeeDto createEmployee(EmployeeCreateDto employeeDto) {
         Employee employee = employeeMapper.toEntity(employeeDto);
-        // Добавил проверку, что User существует
+        
         User user = userDao.findById(employeeDto.getUserId())
             .orElseThrow(() ->
                 new ResourceNotFoundException("User not found with id " + employeeDto.getUserId()));
@@ -55,7 +53,6 @@ public class EmployeeService {
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE_NOT_FOUND_MESSAGE + id));
 
-        //Проверка, что если в employeeDto передан новый userId
         if (employeeDto.getUserId() != null
             && !employeeDto.getUserId().equals(employee.getUser().getId())) {
             User user = userDao
@@ -63,7 +60,7 @@ public class EmployeeService {
                     .orElseThrow(
                         () -> new ResourceNotFoundException(
                             "User not found with id " + employeeDto.getUserId()));
-            employee.setUser(user); // установили нового юзера
+            employee.setUser(user); 
         }
 
         employeeMapper.updateEmployeeFromDto(employeeDto, employee);

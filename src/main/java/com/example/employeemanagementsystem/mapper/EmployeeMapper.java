@@ -2,7 +2,7 @@ package com.example.employeemanagementsystem.mapper;
 
 import com.example.employeemanagementsystem.dao.DepartmentDao;
 import com.example.employeemanagementsystem.dao.PositionDao;
-import com.example.employeemanagementsystem.dao.UserDao; // Добавлен UserDao
+import com.example.employeemanagementsystem.dao.UserDao; 
 import com.example.employeemanagementsystem.dto.create.EmployeeCreateDto;
 import com.example.employeemanagementsystem.dto.get.EmployeeDto;
 import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
@@ -30,12 +30,12 @@ public abstract class EmployeeMapper {
     protected PositionDao positionDao;
 
     @Autowired
-    protected UserDao userDao; // Добавлен UserDao
+    protected UserDao userDao; 
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "departmentId", target = "department")
     @Mapping(source = "positionId", target = "position")
-    @Mapping(source = "userId", target = "user") // Маппинг userId на user
+    @Mapping(source = "userId", target = "user") 
     public abstract Employee toEntity(EmployeeCreateDto dto);
 
     public abstract EmployeeDto toDto(Employee entity);
@@ -43,7 +43,7 @@ public abstract class EmployeeMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "departmentId", target = "department")
     @Mapping(source = "positionId", target = "position")
-    @Mapping(source = "userId", target = "user") // Маппинг userId на user при обновлении
+    @Mapping(source = "userId", target = "user") 
     public abstract void updateEmployeeFromDto(EmployeeCreateDto dto,
                                                @MappingTarget Employee entity);
 
@@ -62,7 +62,7 @@ public abstract class EmployeeMapper {
                 + positionId));
     }
 
-    protected User userFromId(Long userId) { // Метод для получения User по ID
+    protected User userFromId(Long userId) { 
         return userId == null ? null
             : userDao.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));

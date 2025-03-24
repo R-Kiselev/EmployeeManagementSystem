@@ -48,7 +48,7 @@ public class EmployeeController {
         List<Employee> employees = employeeService.getEmployeesBySalaryRange(minSalary, maxSalary);
         List<EmployeeDto> employeeDtos = employees.stream()
             .map(employeeMapper::toDto)
-            .toList(); // Use .toList() directly
+            .toList(); 
 
         return ResponseEntity.ok(employeeDtos);
     }

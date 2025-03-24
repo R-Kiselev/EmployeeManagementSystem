@@ -49,7 +49,7 @@ public class Employee {
     @JoinColumn(name = "position_id")
     private Position position;
 
-    @OneToOne(fetch = FetchType.LAZY) // Изменено на LAZY
-    @JoinColumn(name = "user_id")   // Внешний ключ теперь user_id
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 }
