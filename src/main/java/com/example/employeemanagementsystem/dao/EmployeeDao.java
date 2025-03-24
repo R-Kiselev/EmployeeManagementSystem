@@ -13,4 +13,8 @@ public interface EmployeeDao extends JpaRepository<Employee, Long> {
     List<Employee> findBySalaryGreaterThanEqual(BigDecimal minSalary);
 
     List<Employee> findBySalaryLessThanEqual(BigDecimal maxSalary);
+
+    List<Employee> findByDepartmentId(Long departmentId);
+
+    List<Employee> findByPositionId(Long positionId);
 }
