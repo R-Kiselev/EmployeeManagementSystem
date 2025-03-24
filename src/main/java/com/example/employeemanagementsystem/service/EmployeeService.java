@@ -111,6 +111,20 @@ public class EmployeeService {
         return employees.stream().map(employeeMapper::toDto).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<EmployeeDto> getEmployeesByDepartmentIdAndPositionId(
+            Long departmentId, Long positionId) {
+        List<Employee> employees = employeeDao.findByDepartmentIdAndPositionId(
+            departmentId, positionId);
+        return employees.stream().map(employeeMapper::toDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<EmployeeDto> getEmployeesByRoleNameNative(String roleName) {
+        List<Employee> employees = employeeDao.findByRoleNameNative(roleName);
+        return employees.stream().map(employeeMapper::toDto).toList();
+    }
+
     @Transactional
     public void deleteEmployee(Long id) {
         if (!employeeDao.existsById(id)) {

@@ -40,6 +40,23 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeDto);
     }
 
+    @GetMapping(params = {"departmentId", "positionId"})
+    // Используем params, чтобы различать эндпоинты
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByDepartmentAndPosition(
+        @RequestParam("departmentId") Long departmentId,
+        @RequestParam("positionId") Long positionId) {
+        List<EmployeeDto> employees = employeeService.getEmployeesByDepartmentIdAndPositionId(
+            departmentId, positionId);
+        return ResponseEntity.ok(employees);
+    }
+
+    @GetMapping(params = {"roleName"})
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByRoleName(
+        @RequestParam("roleName") String roleName) {
+        List<EmployeeDto> employees = employeeService.getEmployeesByRoleNameNative(roleName);
+        return ResponseEntity.ok(employees);
+    }
+
     @GetMapping
     public ResponseEntity<List<EmployeeDto>> getAllEmployees(
         @RequestParam(value = "min_salary", required = false) BigDecimal minSalary,
