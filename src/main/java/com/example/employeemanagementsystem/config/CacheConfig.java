@@ -10,6 +10,6 @@ public class CacheConfig {
 
     @Bean
     public InMemoryCache<Long, Department> departmentCache() {
-        return new InMemoryCache<>(600_000); // 10 min
+        return new InMemoryCache<>(128);
     }
 }

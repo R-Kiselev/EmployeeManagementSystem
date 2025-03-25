@@ -2,9 +2,7 @@ package com.example.employeemanagementsystem.utils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.LinkedBlockingDeque;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 
@@ -15,30 +13,25 @@ public class InMemoryCache<K, V> {
     private static class CacheEntry<V> {
         @Getter
         private final V value;
-        private final long expiryTime;
 
-        public CacheEntry(V value, long expiryTime) {
+        public CacheEntry(V value) {
             this.value = value;
-            this.expiryTime = expiryTime;
-        }
-
-        public boolean isExpired() {
-            return System.currentTimeMillis() >= expiryTime;
         }
     }
 
     private final Map<K, CacheEntry<V>> cache = new ConcurrentHashMap<>();
-    private final long ttlMillis;
+    private final LinkedBlockingDeque<K> queue = new LinkedBlockingDeque<>();
+    private final int capacity;
 
     public InMemoryCache() {
-        this(300_000); // Значение по умолчанию: 5 минут
+        this(128);
     }
 
-    public InMemoryCache(long ttlMillis) {
-        this.ttlMillis = ttlMillis;
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(this::evictExpiredEntries,
-            ttlMillis, ttlMillis, TimeUnit.MILLISECONDS);
+    public InMemoryCache(int capacity) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Capacity must be positive");
+        }
+        this.capacity = capacity;
     }
 
     public V get(K key) {
@@ -46,31 +39,43 @@ public class InMemoryCache<K, V> {
         if (entry == null) {
             return null;
         }
-        if (entry.isExpired()) {
-            cache.remove(key);
-            return null;
-        }
+
+        queue.remove(key);
+        queue.offer(key);
+
         return entry.getValue();
     }
 
     public void put(K key, V value) {
-        CacheEntry<V> entry = new CacheEntry<>(value, System.currentTimeMillis() + ttlMillis);
+        CacheEntry<V> entry = new CacheEntry<>(value);
+
+        if (cache.containsKey(key)) {
+
+            cache.put(key, entry);
+            queue.remove(key);
+            queue.offer(key);
+            return;
+        }
+
+        if (cache.size() >= capacity) {
+
+            K lruKey = queue.poll();
+            if (lruKey != null) {
+                cache.remove(lruKey);
+            }
+        }
+
         cache.put(key, entry);
+        queue.offer(key);
     }
 
     public void evict(K key) {
         cache.remove(key);
+        queue.remove(key);
     }
 
     public void clear() {
         cache.clear();
-    }
-
-    private void evictExpiredEntries() {
-        for (Map.Entry<K, CacheEntry<V>> entry : cache.entrySet()) {
-            if (entry.getValue().isExpired()) {
-                cache.remove(entry.getKey());
-            }
-        }
+        queue.clear();
     }
 }
