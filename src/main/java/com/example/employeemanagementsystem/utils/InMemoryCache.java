@@ -4,11 +4,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @SuppressWarnings("squid:S6829")
 @Component
 public class InMemoryCache<K, V> {
+
+    private static final Logger logger = LoggerFactory.getLogger(InMemoryCache.class);
 
     private static class CacheEntry<V> {
         @Getter
@@ -39,9 +43,14 @@ public class InMemoryCache<K, V> {
         if (entry == null) {
             return null;
         }
-
-        queue.remove(key);
-        queue.offer(key);
+        boolean removed = queue.remove(key);
+        if (!removed) {
+            logger.warn("Key {} not found in queue during get operation.", key);
+        }
+        boolean offered = queue.offer(key);
+        if (!offered) {
+            logger.error("Failed to offer key {} to the queue during get operation.", key);
+        }
 
         return entry.getValue();
     }
@@ -52,8 +61,16 @@ public class InMemoryCache<K, V> {
         if (cache.containsKey(key)) {
 
             cache.put(key, entry);
-            queue.remove(key);
-            queue.offer(key);
+            boolean removed = queue.remove(key);
+            if (!removed) {
+                logger.warn("Key {} not found in queue during put operation "
+                    + "when key already exists.", key);
+            }
+            boolean offered = queue.offer(key);
+            if (!offered) {
+                logger.error("Failed to offer key {} to the "
+                    + "queue during put operation when key already exists.", key);
+            }
             return;
         }
 
@@ -66,12 +83,30 @@ public class InMemoryCache<K, V> {
         }
 
         cache.put(key, entry);
-        queue.offer(key);
+        boolean offered = queue.offer(key);
+        if (!offered) {
+            logger.error("Failed to offer key {} to the queue during put operation.", key);
+        }
     }
 
     public void evict(K key) {
         cache.remove(key);
-        queue.remove(key);
+        boolean removed = queue.remove(key);
+        if (!removed) {
+            logger.warn("Key {} not found in queue during evict operation.", key);
+        }
+    }
+
+    public V remove(K key) {
+        CacheEntry<V> entry = cache.remove(key);
+        if (entry != null) {
+            boolean removed = queue.remove(key);
+            if (!removed) {
+                logger.warn("Key {} not found in queue during remove operation.", key);
+            }
+            return entry.getValue();
+        }
+        return null;
     }
 
     public void clear() {
