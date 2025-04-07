@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/logs")
 @Tag(name = "Log Controller", description = "API для работы с лог-файлами")
 public class LogsController {
-
     private static final String LOG_FILE_PATH = "logs/employee-management.log";
     private static final String ARCHIVE_LOG_FILE_PATTERN = "logs/employee-management-%s.log";
     private static final DateTimeFormatter DATE_FORMATTER =
@@ -38,7 +37,7 @@ public class LogsController {
     @ApiResponse(responseCode = "404", description = "Логи не найдены")
     @ApiResponse(responseCode = "400", description = "Неверный формат даты")
     public ResponseEntity<Resource> downloadLogFile(
-        @Parameter(description = "Дата в формате **yyyy-MM-dd**", required = true,
+        @Parameter(description = "Дата в формате yyyy-MM-dd", required = true,
             example = "2025-04-01")
         @RequestParam(name = "date") String dateStr) throws IOException {
         LocalDate date;
@@ -66,7 +65,7 @@ public class LogsController {
     @ApiResponse(responseCode = "404", description = "Логи не найдены")
     @ApiResponse(responseCode = "400", description = "Неверный формат даты")
     public ResponseEntity<String> viewLogFile(
-        @Parameter(description = "Дата в формате **yyyy-MM-dd**",
+        @Parameter(description = "Дата в формате yyyy-MM-dd",
             required = true, example = "2025-04-01")
         @RequestParam(name = "date") String dateStr) throws IOException {
         LocalDate date;
@@ -87,12 +86,7 @@ public class LogsController {
     }
 
     private Path getLogFilePath(LocalDate date) {
-        String fileName;
-        if (date.equals(LocalDate.now())) {
-            fileName = LOG_FILE_PATH;
-        } else {
-            fileName = String.format(ARCHIVE_LOG_FILE_PATTERN, date.format(DATE_FORMATTER));
-        }
+        String fileName = String.format(ARCHIVE_LOG_FILE_PATTERN, date.format(DATE_FORMATTER));
         return Paths.get(fileName);
     }
 }
