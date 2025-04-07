@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
-@Order(1) // Более высокий приоритет
+@Order(1)
 public class SwaggerExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
@@ -16,6 +16,6 @@ public class SwaggerExceptionHandler {
         if (ex.getMessage() != null && ex.getMessage().contains("org.springdoc")) {
             return new ResponseEntity<>("Swagger error ignored", HttpStatus.OK);
         }
-        return null; // Пропускаем обработку, если ошибка не связана со Swagger
+        return null;
     }
 }

@@ -41,24 +41,16 @@ public class LogsController {
         @Parameter(description = "Дата в формате **yyyy-MM-dd**", required = true,
             example = "2025-04-01")
         @RequestParam(name = "date") String dateStr) throws IOException {
-
-        // Валидация формата даты
         LocalDate date;
         try {
             date = LocalDate.parse(dateStr, DATE_FORMATTER);
         } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().build();
         }
-
-        // Определение пути к файлу логов
         Path logPath = getLogFilePath(date);
-
-        // Проверка существования файла
         if (!Files.exists(logPath)) {
             return ResponseEntity.notFound().build();
         }
-
-        // Возвращаем файл для скачивания
         Resource resource = new UrlResource(logPath.toUri());
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION,
@@ -77,24 +69,16 @@ public class LogsController {
         @Parameter(description = "Дата в формате **yyyy-MM-dd**",
             required = true, example = "2025-04-01")
         @RequestParam(name = "date") String dateStr) throws IOException {
-
-        // Валидация формата даты
         LocalDate date;
         try {
             date = LocalDate.parse(dateStr, DATE_FORMATTER);
         } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().build();
         }
-
-        // Определение пути к файлу логов
         Path logPath = getLogFilePath(date);
-
-        // Проверка существования файла
         if (!Files.exists(logPath)) {
             return ResponseEntity.notFound().build();
         }
-
-        // Чтение содержимого файла
         String logContent = Files.readString(logPath);
 
         return ResponseEntity.ok()
@@ -102,7 +86,6 @@ public class LogsController {
             .body(logContent);
     }
 
-    // Вспомогательный метод для получения пути к файлу логов
     private Path getLogFilePath(LocalDate date) {
         String fileName;
         if (date.equals(LocalDate.now())) {
