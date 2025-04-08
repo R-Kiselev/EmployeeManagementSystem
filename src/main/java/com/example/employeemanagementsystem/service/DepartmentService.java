@@ -4,6 +4,7 @@ import com.example.employeemanagementsystem.dao.DepartmentDao;
 import com.example.employeemanagementsystem.dto.create.DepartmentCreateDto;
 import com.example.employeemanagementsystem.dto.get.DepartmentDto;
 import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
+import com.example.employeemanagementsystem.exception.ValidationException;
 import com.example.employeemanagementsystem.mapper.DepartmentMapper;
 import com.example.employeemanagementsystem.model.Department;
 import com.example.employeemanagementsystem.model.Employee;
@@ -41,18 +42,18 @@ public class DepartmentService {
 
     @Transactional(readOnly = true)
     public DepartmentDto getDepartmentById(Long id) {
-        logger.debug("Attempting to retrieve department with id {} from cache.", id); 
+        logger.debug("Attempting to retrieve department with id {} from cache.", id);
         Department cachedDepartment = departmentCache.get(id);
         if (cachedDepartment != null) {
             logger.info("Department with id {} retrieved from cache.", id);
             return departmentMapper.toDto(cachedDepartment);
         }
 
-        logger.debug("Department with id {} not found in cache. Retrieving from database.", id); 
+        logger.debug("Department with id {} not found in cache. Retrieving from database.", id);
         Department department = departmentDao
             .findById(id)
             .orElseThrow(() -> {
-                logger.warn("Department with id {} not found.", id); 
+                logger.warn("Department with id {} not found.", id);
                 return new ResourceNotFoundException(DEPARTMENT_NOT_FOUND_MESSAGE + id);
             });
 
@@ -63,17 +64,23 @@ public class DepartmentService {
 
     @Transactional(readOnly = true)
     public List<DepartmentDto> getAllDepartments() {
-        logger.debug("Retrieving all departments."); 
+        logger.debug("Retrieving all departments.");
         List<DepartmentDto> departments =  departmentDao.findAll().stream()
             .map(departmentMapper::toDto)
             .collect(Collectors.toList());
-        logger.info("Retrieved all departments. Total count: {}", departments.size()); 
+        logger.info("Retrieved all departments. Total count: {}", departments.size());
         return departments;
     }
 
     @Transactional
     public DepartmentDto createDepartment(DepartmentCreateDto departmentDto) {
-        logger.debug("Creating new department: {}", departmentDto); 
+        logger.debug("Creating new department: {}", departmentDto);
+        String name = departmentDto.getName();
+        // Проверка уникальности имени
+        if (departmentDao.findByName(name).isPresent()) {
+            logger.warn("Attempt to create department with existing name: {}", name);
+            throw new ValidationException("Department name already exists");
+        }
         Department department = departmentMapper.toEntity(departmentDto);
         Department savedDepartment = departmentDao.save(department);
         departmentCache.put(savedDepartment.getId(), savedDepartment);
@@ -83,13 +90,21 @@ public class DepartmentService {
 
     @Transactional
     public DepartmentDto updateDepartment(Long id, DepartmentCreateDto departmentDto) {
-        logger.debug("Updating department with id {}: {}", id, departmentDto); 
+        logger.debug("Updating department with id {}: {}", id, departmentDto);
         Department department = departmentDao
             .findById(id)
             .orElseThrow(() -> {
-                logger.warn("Attempt to update non-existing department with id {}.", id);  
+                logger.warn("Attempt to update non-existing department with id {}.", id);
                 return new ResourceNotFoundException(DEPARTMENT_NOT_FOUND_MESSAGE + id);
             });
+
+        String newName = departmentDto.getName();
+        // Проверка уникальности имени для другого отдела
+        Department existingDepartmentWithName = departmentDao.findByName(newName).orElse(null);
+        if (existingDepartmentWithName != null && !existingDepartmentWithName.getId().equals(id)) {
+            logger.warn("Attempt to update department with id {} to an existing name: {}", id, newName);
+            throw new ValidationException("Department name already exists");
+        }
 
         departmentMapper.updateDepartmentFromDto(departmentDto, department);
         Department updatedDepartment = departmentDao.save(department);
@@ -100,10 +115,10 @@ public class DepartmentService {
 
     @Transactional
     public void deleteDepartment(Long id) {
-        logger.debug("Deleting department with id {}.", id);  
+        logger.debug("Deleting department with id {}.", id);
         Department department = departmentDao.findById(id)
             .orElseThrow(() -> {
-                logger.warn("Attempt to delete non-existing department with id {}.", id); 
+                logger.warn("Attempt to delete non-existing department with id {}.", id);
                 return new ResourceNotFoundException(DEPARTMENT_NOT_FOUND_MESSAGE + id);
             });
 
@@ -116,6 +131,6 @@ public class DepartmentService {
         departmentCache.evict(id);
         logger.info("Department with id {} removed from cache.", id);
         departmentDao.delete(department);
-        logger.info("Department with id {} deleted.", id); 
+        logger.info("Department with id {} deleted.", id);
     }
 }
