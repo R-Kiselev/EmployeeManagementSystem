@@ -42,7 +42,7 @@ public class DepartmentController {
     @Operation(summary = "Получить отдел по ID", description = "Возвращает отдел по указанному ID")
     @ApiResponse(responseCode = "200", description = "Отдел найден")
     @ApiResponse(responseCode = "404", description = "Отдел не найден")
-    public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable Long id) {
+    public ResponseEntity<DepartmentDto> getDepartmentById(@Valid @PathVariable Long id) {
         DepartmentDto departmentDto = departmentService.getDepartmentById(id);
         if (departmentDto == null) {
             throw new ResourceNotFoundException("Department not found with id " + id);
