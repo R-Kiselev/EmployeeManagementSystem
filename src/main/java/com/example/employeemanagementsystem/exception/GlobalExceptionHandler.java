@@ -54,8 +54,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleMethodArgumentTypeMismatchException
-        (MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<String> handleMethodArgumentTypeMismatchException(
+        MethodArgumentTypeMismatchException ex) {
         String paramName = ex.getName();
         String value = ex.getValue() != null ? ex.getValue().toString() : "null";
         String message = String.format("Invalid value '%s' for parameter '%s'. Expected type: %s",
