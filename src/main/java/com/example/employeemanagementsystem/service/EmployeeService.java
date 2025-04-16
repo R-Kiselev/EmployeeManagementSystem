@@ -5,12 +5,14 @@ import com.example.employeemanagementsystem.dao.UserDao;
 import com.example.employeemanagementsystem.dto.create.EmployeeCreateDto;
 import com.example.employeemanagementsystem.dto.get.EmployeeDto;
 import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
+import com.example.employeemanagementsystem.exception.ValidationException;
 import com.example.employeemanagementsystem.mapper.EmployeeMapper;
 import com.example.employeemanagementsystem.model.Employee;
 import com.example.employeemanagementsystem.model.User;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,7 @@ public class EmployeeService {
 
     private final EmployeeDao employeeDao;
     private final EmployeeMapper employeeMapper;
-    private final UserDao userDao; 
+    private final UserDao userDao;
 
     @Autowired
     public EmployeeService(EmployeeDao employeeDao,
@@ -36,7 +38,7 @@ public class EmployeeService {
     @Transactional
     public EmployeeDto createEmployee(EmployeeCreateDto employeeDto) {
         Employee employee = employeeMapper.toEntity(employeeDto);
-        
+
         User user = userDao.findById(employeeDto.getUserId())
             .orElseThrow(() ->
                 new ResourceNotFoundException("User not found with id " + employeeDto.getUserId()));
@@ -44,6 +46,34 @@ public class EmployeeService {
         Employee savedEmployee = employeeDao.save(employee);
 
         return employeeMapper.toDto(savedEmployee);
+    }
+
+    @Transactional
+    public List<EmployeeDto> createEmployeesBulk(List<EmployeeCreateDto> employeeDtos) {
+        if (employeeDtos == null || employeeDtos.isEmpty()) {
+            throw new ValidationException("Employee list cannot be null or empty");
+        }
+
+        List<Employee> employees = employeeDtos.stream()
+            .peek(dto -> {
+                if (dto == null || dto.getUserId() == null) {
+                    throw new ValidationException("Employee DTO "
+                        + "or user ID cannot be null in bulk creation");
+                }
+            })
+            .map(dto -> {
+                Employee employee = employeeMapper.toEntity(dto);
+                User user = userDao.findById(dto.getUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found with id " + dto.getUserId()));
+                employee.setUser(user);
+                return employee;
+            })
+            .collect(Collectors.toList());
+
+        return employeeDao.saveAll(employees).stream()
+            .map(employeeMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -56,18 +86,17 @@ public class EmployeeService {
         if (employeeDto.getUserId() != null
             && !employeeDto.getUserId().equals(employee.getUser().getId())) {
             User user = userDao
-                    .findById(employeeDto.getUserId())
-                    .orElseThrow(
-                        () -> new ResourceNotFoundException(
-                            "User not found with id " + employeeDto.getUserId()));
-            employee.setUser(user); 
+                .findById(employeeDto.getUserId())
+                .orElseThrow(
+                    () -> new ResourceNotFoundException(
+                        "User not found with id " + employeeDto.getUserId()));
+            employee.setUser(user);
         }
 
         employeeMapper.updateEmployeeFromDto(employeeDto, employee);
         Employee updatedEmployee = employeeDao.save(employee);
         return employeeMapper.toDto(updatedEmployee);
     }
-
 
     @Transactional(readOnly = true)
     public Optional<Employee> getEmployeeById(Long id) {
@@ -113,7 +142,7 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     public List<EmployeeDto> getEmployeesByDepartmentIdAndPositionId(
-            Long departmentId, Long positionId) {
+        Long departmentId, Long positionId) {
         List<Employee> employees = employeeDao.findByDepartmentIdAndPositionId(
             departmentId, positionId);
         return employees.stream().map(employeeMapper::toDto).toList();

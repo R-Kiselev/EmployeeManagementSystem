@@ -102,7 +102,8 @@ public class DepartmentService {
         // Проверка уникальности имени для другого отдела
         Department existingDepartmentWithName = departmentDao.findByName(newName).orElse(null);
         if (existingDepartmentWithName != null && !existingDepartmentWithName.getId().equals(id)) {
-            logger.warn("Attempt to update department with id {} to an existing name: {}", id, newName);
+            logger.warn("Attempt to update department with id {} to an existing name: {}",
+                id, newName);
             throw new ValidationException("Department name already exists");
         }
 

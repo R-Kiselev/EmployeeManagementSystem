@@ -100,6 +100,17 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee);
     }
 
+    @PostMapping("/bulk")
+    @Operation(summary = "Создать несколько сотрудников",
+        description = "Создает несколько сотрудников одновременно")
+    @ApiResponse(responseCode = "201", description = "Сотрудники успешно созданы")
+    @ApiResponse(responseCode = "400", description = "Некорректные данные")
+    public ResponseEntity<List<EmployeeDto>> createEmployeesBulk(
+        @Valid @RequestBody List<EmployeeCreateDto> employeeDtos) {
+        List<EmployeeDto> createdEmployees = employeeService.createEmployeesBulk(employeeDtos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdEmployees);
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Обновить сотрудника",
         description = "Обновляет существующего сотрудника по ID")
