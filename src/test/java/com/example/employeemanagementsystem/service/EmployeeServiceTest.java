@@ -8,6 +8,7 @@ import com.example.employeemanagementsystem.dto.get.EmployeeDto;
 import com.example.employeemanagementsystem.dto.get.PositionDto;
 import com.example.employeemanagementsystem.dto.get.UserDto;
 import com.example.employeemanagementsystem.exception.ResourceNotFoundException;
+import com.example.employeemanagementsystem.exception.ValidationException;
 import com.example.employeemanagementsystem.mapper.EmployeeMapper;
 import com.example.employeemanagementsystem.model.Department;
 import com.example.employeemanagementsystem.model.Employee;
@@ -22,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -414,5 +416,138 @@ class EmployeeServiceTest {
         assertNotNull(result, "Updated Employee should not be null");
         assertEquals(testEmployee.getId(), result.getId(), "Returned Employee ID should match");
         verify(employeeDao, times(1)).save(testEmployee);
+    }
+
+    @Test
+    void createEmployeesBulk_WithValidDtos_ShouldReturnEmployeeDtos() {
+        EmployeeCreateDto secondEmployeeCreateDto = new EmployeeCreateDto();
+        secondEmployeeCreateDto.setFirstName("Jane");
+        secondEmployeeCreateDto.setLastName("Smith");
+        secondEmployeeCreateDto.setEmail("jane.smith@example.com");
+        secondEmployeeCreateDto.setHireDate(LocalDate.of(2023, 2, 1));
+        secondEmployeeCreateDto.setSalary(BigDecimal.valueOf(60000));
+        secondEmployeeCreateDto.setIsActive(true);
+        secondEmployeeCreateDto.setUserId(2L);
+        secondEmployeeCreateDto.setDepartmentId(1L);
+        secondEmployeeCreateDto.setPositionId(1L);
+
+        Employee secondEmployee = new Employee();
+        secondEmployee.setId(2L);
+        secondEmployee.setFirstName("Jane");
+        secondEmployee.setLastName("Smith");
+
+        EmployeeDto secondEmployeeDto = new EmployeeDto();
+        secondEmployeeDto.setId(2L);
+        secondEmployeeDto.setFirstName("Jane");
+        secondEmployeeDto.setLastName("Smith");
+
+        List<EmployeeCreateDto> dtos = Arrays.asList(testEmployeeCreateDto, secondEmployeeCreateDto);
+
+        when(employeeMapper.toEntity(testEmployeeCreateDto)).thenReturn(testEmployee);
+        when(employeeMapper.toEntity(secondEmployeeCreateDto)).thenReturn(secondEmployee);
+        when(userDao.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userDao.findById(2L)).thenReturn(Optional.of(new User()));
+        when(employeeDao.saveAll(anyList())).thenReturn(Arrays.asList(testEmployee, secondEmployee));
+        when(employeeMapper.toDto(testEmployee)).thenReturn(testEmployeeDto);
+        when(employeeMapper.toDto(secondEmployee)).thenReturn(secondEmployeeDto);
+
+        List<EmployeeDto> result = employeeService.createEmployeesBulk(dtos);
+
+        assertNotNull(result, "Result list should not be null");
+        assertEquals(2, result.size(), "Result list should contain two EmployeeDtos");
+        assertEquals(testEmployeeDto.getId(), result.get(0).getId(), "First EmployeeDto ID should match");
+        assertEquals(secondEmployeeDto.getId(), result.get(1).getId(), "Second EmployeeDto ID should match");
+        verify(userDao, times(1)).findById(1L);
+        verify(userDao, times(1)).findById(2L);
+        verify(employeeDao, times(1)).saveAll(anyList());
+        verify(employeeMapper, times(2)).toEntity(any());
+        verify(employeeMapper, times(2)).toDto(any());
+    }
+
+    @Test
+    void createEmployeesBulk_WithNullList_ShouldThrowValidationException() {
+        Exception exception = assertThrows(ValidationException.class,
+            () -> employeeService.createEmployeesBulk(null));
+
+        assertEquals("Employee list cannot be null or empty", exception.getMessage(), "Exception message should match");
+        verify(employeeMapper, never()).toEntity(any());
+        verify(userDao, never()).findById(anyLong());
+        verify(employeeDao, never()).saveAll(anyList());
+    }
+
+    @Test
+    void createEmployeesBulk_WithEmptyList_ShouldThrowValidationException() {
+        Exception exception = assertThrows(ValidationException.class,
+            () -> employeeService.createEmployeesBulk(Collections.emptyList()));
+
+        assertEquals("Employee list cannot be null or empty", exception.getMessage(), "Exception message should match");
+        verify(employeeMapper, never()).toEntity(any());
+        verify(userDao, never()).findById(anyLong());
+        verify(employeeDao, never()).saveAll(anyList());
+    }
+
+    @Test
+    void createEmployeesBulk_WithNullDtoInList_ShouldThrowValidationException() {
+        List<EmployeeCreateDto> dtos = Arrays.asList(testEmployeeCreateDto, null);
+
+        // Mock userDao for the valid DTO to prevent ResourceNotFoundException
+        when(userDao.findById(1L)).thenReturn(Optional.of(testUser));
+        when(employeeMapper.toEntity(testEmployeeCreateDto)).thenReturn(testEmployee);
+
+        Exception exception = assertThrows(ValidationException.class,
+            () -> employeeService.createEmployeesBulk(dtos));
+
+        assertEquals("Employee DTO or user ID cannot be null in bulk creation", exception.getMessage(), "Exception message should match");
+        verify(userDao, times(1)).findById(1L);
+        verify(employeeMapper, times(1)).toEntity(testEmployeeCreateDto);
+        verify(employeeDao, never()).saveAll(anyList());
+    }
+
+    @Test
+    void createEmployeesBulk_WithNullUserIdInDto_ShouldThrowValidationException() {
+        EmployeeCreateDto invalidDto = new EmployeeCreateDto();
+        invalidDto.setUserId(null); // Null userId
+        List<EmployeeCreateDto> dtos = Arrays.asList(testEmployeeCreateDto, invalidDto);
+
+        // Mock userDao for the valid DTO to prevent ResourceNotFoundException
+        when(userDao.findById(1L)).thenReturn(Optional.of(testUser));
+        when(employeeMapper.toEntity(testEmployeeCreateDto)).thenReturn(testEmployee);
+
+        Exception exception = assertThrows(ValidationException.class,
+            () -> employeeService.createEmployeesBulk(dtos));
+
+        assertEquals("Employee DTO or user ID cannot be null in bulk creation", exception.getMessage(), "Exception message should match");
+        verify(userDao, times(1)).findById(1L);
+        verify(employeeMapper, times(1)).toEntity(testEmployeeCreateDto);
+        verify(employeeDao, never()).saveAll(anyList());
+    }
+
+    @Test
+    void createEmployeesBulk_WithNonExistentUser_ShouldThrowResourceNotFoundException() {
+        EmployeeCreateDto secondEmployeeCreateDto = new EmployeeCreateDto();
+        secondEmployeeCreateDto.setFirstName("Jane");
+        secondEmployeeCreateDto.setLastName("Smith");
+        secondEmployeeCreateDto.setEmail("jane.smith@example.com");
+        secondEmployeeCreateDto.setHireDate(LocalDate.of(2023, 2, 1));
+        secondEmployeeCreateDto.setSalary(BigDecimal.valueOf(60000));
+        secondEmployeeCreateDto.setIsActive(true);
+        secondEmployeeCreateDto.setUserId(2L);
+        secondEmployeeCreateDto.setDepartmentId(1L);
+        secondEmployeeCreateDto.setPositionId(1L);
+
+        List<EmployeeCreateDto> dtos = Arrays.asList(testEmployeeCreateDto, secondEmployeeCreateDto);
+
+        when(employeeMapper.toEntity(any())).thenReturn(testEmployee);
+        when(userDao.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userDao.findById(2L)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(ResourceNotFoundException.class,
+            () -> employeeService.createEmployeesBulk(dtos));
+
+        assertEquals("User not found with id 2", exception.getMessage(), "Exception message should match");
+        verify(userDao, times(1)).findById(1L);
+        verify(userDao, times(1)).findById(2L);
+        verify(employeeMapper, times(2)).toEntity(any());
+        verify(employeeDao, never()).saveAll(anyList());
     }
 }

@@ -76,7 +76,6 @@ public class DepartmentService {
     public DepartmentDto createDepartment(DepartmentCreateDto departmentDto) {
         logger.debug("Creating new department: {}", departmentDto);
         String name = departmentDto.getName();
-        // Проверка уникальности имени
         if (departmentDao.findByName(name).isPresent()) {
             logger.warn("Attempt to create department with existing name: {}", name);
             throw new ValidationException("Department name already exists");
@@ -99,7 +98,6 @@ public class DepartmentService {
             });
 
         String newName = departmentDto.getName();
-        // Проверка уникальности имени для другого отдела
         Department existingDepartmentWithName = departmentDao.findByName(newName).orElse(null);
         if (existingDepartmentWithName != null && !existingDepartmentWithName.getId().equals(id)) {
             logger.warn("Attempt to update department with id {} to an existing name: {}",
