@@ -1,17 +1,37 @@
-FROM mcr.microsoft.com/devcontainers/java:1-21-bullseye
+# Этап 1: Сборка приложения с Gradle
+FROM gradle:8.10.2-jdk23 AS builder
 
-ARG INSTALL_MAVEN="false"
-ARG MAVEN_VERSION=""
+# Устанавливаем рабочую директорию
+WORKDIR /app
 
-ARG INSTALL_GRADLE="false"
-ARG GRADLE_VERSION=""
+# Копируем Gradle файлы для кэширования зависимостей
+COPY ./build.gradle.kts settings.gradle.kts ./
+COPY ./gradlew ./
+COPY ./gradle ./gradle
 
-RUN if [ "${INSTALL_MAVEN}" = "true" ]; then su vscode -c "umask 0002 && . /usr/local/sdkman/bin/sdkman-init.sh && sdk install maven \"${MAVEN_VERSION}\""; fi \
-    && if [ "${INSTALL_GRADLE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/local/sdkman/bin/sdkman-init.sh && sdk install gradle \"${GRADLE_VERSION}\""; fi
+# Даем права на выполнение gradlew
+RUN chmod +x gradlew
 
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+# Загружаем зависимости
+RUN ./gradlew dependencies --no-daemon
 
-# [Optional] Uncomment this line to install global node packages.
-# RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
+# Копируем исходный код
+COPY ./src ./src
+
+# Собираем JAR
+RUN ./gradlew bootJar --no-daemon
+
+# Этап 2: Запуск приложения
+FROM openjdk:23-jdk-slim
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Копируем собранный JAR
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+# Открываем порт
+EXPOSE 8080
+
+# Запускаем приложение
+CMD ["java", "-jar", "app.jar"]
