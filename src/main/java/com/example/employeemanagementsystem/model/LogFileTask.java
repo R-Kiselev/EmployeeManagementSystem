@@ -1,10 +1,10 @@
 package com.example.employeemanagementsystem.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.RequiredArgsConstructor;
-
 import java.nio.file.Path;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
 
 @Getter
 @Setter

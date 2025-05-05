@@ -19,7 +19,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -29,7 +34,8 @@ public class LogsController {
 
     private final LogFileId logFileId;
     private static final String ARCHIVE_LOG_FILE_PATTERN = "logs/employee-management-%s.log";
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_FORMATTER =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
     public LogsController(LogFileId logFileId) {
@@ -42,7 +48,8 @@ public class LogsController {
     @ApiResponse(responseCode = "202", description = "Задача успешно создана")
     @ApiResponse(responseCode = "400", description = "Неверный формат даты")
     public ResponseEntity<String> createLogFileTask(
-        @Parameter(description = "Дата в формате yyyy-MM-dd", required = true, example = "2025-04-01")
+        @Parameter(description = "Дата в формате yyyy-MM-dd", required = true, example =
+            "2025-04-01")
         @RequestParam String date) {
         LocalDate parsedDate;
         try {
@@ -87,7 +94,8 @@ public class LogsController {
         try {
             Resource resource = new UrlResource(filePath.toUri());
             return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filePath.getFileName())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="
+                    + filePath.getFileName())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
         } catch (IOException e) {
@@ -117,7 +125,8 @@ public class LogsController {
         }
         Resource resource = new UrlResource(logPath.toUri());
         return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + logPath.getFileName())
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="
+                + logPath.getFileName())
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
             .body(resource);
     }

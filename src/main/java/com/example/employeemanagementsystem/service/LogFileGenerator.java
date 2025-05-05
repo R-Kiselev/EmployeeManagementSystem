@@ -1,11 +1,6 @@
 package com.example.employeemanagementsystem.service;
 
 import com.example.employeemanagementsystem.model.LogFileTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,13 +9,19 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
 
 @Service
 public class LogFileGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(LogFileGenerator.class);
     private static final String LOG_FILE_PATTERN = "logs/employee-management-%s.log";
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_FORMATTER =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Async
     public void generateLogFileAsync(LogFileTask task, LocalDate date) {
