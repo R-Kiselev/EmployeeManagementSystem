@@ -36,6 +36,11 @@ public class LogFileGenerator {
                 task.setErrorMessage("Log file for date " + date + " not found");
                 return;
             }
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
 
             List<String> lines = Files.readAllLines(logFilePath, StandardCharsets.UTF_8);
             Path outputPath = Paths.get("logs/task-" + task.getTaskId() + "-" + date + ".log");
