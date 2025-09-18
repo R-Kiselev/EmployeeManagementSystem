@@ -78,12 +78,12 @@ const entities = [
     api: '/api/users',
     fields: [
       { key: 'username', label: 'Username' },
-      { key: 'roles', label: 'Roles' }
+      { key: 'roles', label: 'Roles' } // For display in EntityList
     ],
     formFields: [
       { key: 'username', label: 'Username', type: 'text', required: true },
-      { key: 'password', label: 'Password', type: 'password', required: true },
-      { key: 'roleNames', label: 'Roles', type: 'text' }
+      { key: 'password', label: 'Password', type: 'password', required: false }, // Password not required for edit
+      { key: 'roleIds', label: 'Roles', type: 'select-multiple', required: true } // For multi-select in form
     ]
   }
 ];

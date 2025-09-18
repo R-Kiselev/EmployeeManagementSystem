@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Async;
 
 @Service
 public class EmployeeService {
@@ -111,6 +112,7 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
+    @Async
     public List<EmployeeDto> getAllEmployees() {
         return employeeDao.findAll().stream().map(employeeMapper::toDto).toList();
     }

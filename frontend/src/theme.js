@@ -64,15 +64,71 @@ const theme = createTheme({
         root: {
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
-              borderColor: '#2C2C2C',
+              borderColor: '#B0B0B0', // Light grey
             },
             '&:hover fieldset': {
-              borderColor: '#00C4B4',
+              borderColor: '#FFFFFF', // White on hover
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#00C4B4',
+              borderColor: '#00C4B4', // Tiffany blue on focus
             },
           },
+           // Ensure TextField label and input color are correct
+          '& .MuiInputLabel-root': {
+            color: '#B0B0B0',
+            '&.Mui-focused': {
+              color: '#00C4B4',
+            },
+          },
+          '& .MuiInputBase-input': {
+             color: '#FFFFFF',
+          },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          '& fieldset': {
+            borderColor: '#B0B0B0', // Light grey
+          },
+          '&:hover fieldset': {
+            borderColor: '#FFFFFF', // White on hover
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: '#00C4B4', // Tiffany blue on focus
+          },
+        },
+      },
+    },
+     MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: '#B0B0B0',
+          '&.Mui-focused': {
+            color: '#00C4B4',
+          },
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        input: {
+          color: '#FFFFFF', // Default input text color
+          '&::placeholder': {
+            color: '#B0B0B0',
+            opacity: 1,
+          },
+           // === Вариант 3 ===
+          '& input[type="date"]::-webkit-calendar-picker-indicator': {
+             color: '#FFFFFF', // Пытаемся установить цвет напрямую
+             cursor: 'pointer',
+           },
+           // Также можно попробовать fill, если это SVG
+          // '& input[type="date"]::-webkit-calendar-picker-indicator': {
+          //    fill: '#FFFFFF',
+          //    cursor: 'pointer',
+          // },
         },
       },
     },
